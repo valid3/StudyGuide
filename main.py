@@ -5,15 +5,15 @@ def clear():
     else:
         system('clear')
 try:
-    import colorama
+    from colorama import Fore
 except:
     system('pip install colorama')
-import random
-import colorama
+from secrets import choice
+from colorama import Fore,Style
 
 problems = {
+    "What is significant digits of 33.831":"33.8",
     "What law states that the velocity of an object does not change unless the object is acted upon by an external force?":"first law motion",
-    "What is energy associated with the position of an object and the forces acting upon it?":"potential energy",
 }
 
 spec_chars = ["!", ".", "?", ",", ";", ":", "'", "/"]
@@ -27,20 +27,20 @@ for question, answer in problems.items():
     problems[question] = answer.split()
 grade_display = len(problems)
 max_display = len(problems)
-
+# MAIN
 def give_question():
     global grade_display
     global max_display
     if len(problems) == 0:
         clear()
         print(
-            f"Congratulations You Scored {colorama.Fore.GREEN}{grade_display}/{max_display}{colorama.Style.RESET_ALL}\n\n {str((100/max_display)*grade_display)[:5]}%"
+            f"Congratulations You Scored {Fore.GREEN}{grade_display}/{max_display}{Style.RESET_ALL}\n\n {str((100/max_display)*grade_display)[:5]}%"
         )
     else:
         clear()
-        question, answer = random.choice(list(problems.items()))
+        question, answer = choice(list(problems.items()))
         finalAnswer = input(
-            f"Problems Left: {len(problems)}\n\n{colorama.Fore.GREEN}{question}{colorama.Style.RESET_ALL}\n\n{colorama.Fore.BLUE}Answer:{colorama.Style.RESET_ALL} "
+            f"Problems Left: {len(problems)}\n\n{Fore.GREEN}{question}{Style.RESET_ALL}\n\n{Fore.BLUE}Answer:{Style.RESET_ALL} "
         )
         for spec in spec_chars:
             for char in finalAnswer:
@@ -49,10 +49,10 @@ def give_question():
         finalAnswer = list(str(finalAnswer.split()).lower())
         is_right = all(x in finalAnswer for x in str(answer).lower())
         if is_right:
-            print(f"\n{colorama.Fore.GREEN}Correct Answer!{colorama.Style.RESET_ALL}")
+            print(f"\n{Fore.GREEN}Correct Answer!{Style.RESET_ALL}")
             problems.pop(question)
         else:
-            print(f"\n\n{colorama.Fore.RED}Incorrect Answers{colorama.Style.RESET_ALL}\n\nCorrect Answer: {answer}")
+            print(f"\n\n{Fore.RED}Incorrect Answers{Style.RESET_ALL}\n\nCorrect Answer: {answer}")
             problems.pop(question)
             grade_display -= 1
         input("Press ENTER For Next Question: ")
