@@ -1,60 +1,82 @@
-from os import system,path
-def clear():
-    if path.sep == '\\':
-        system('cls')
-    else:
-        system('clear')
-try:
-    from colorama import Fore
-except:
-    system('pip install colorama')
-from secrets import choice
-from colorama import Fore,Style
+# Hey, thank you for using this, I doubt anyone will, but that's okay, sometimes people underappreciate simple softwares
+import random
+import sys
+import os
 
-problems = {
-    "What is significant digits of 33.831":"33.8",
-    "What law states that the velocity of an object does not change unless the object is acted upon by an external force?":"first law motion",
-}
+if sys.platform == 'win32':
+    def clear():
+        os.system('cls')
+else:
+    def clear():
+        os.system('clear')
+# This was made/tested on Mac and Windows. I don't imagine someone studying on a Linux (Lol)
 
-spec_chars = ["!", ".", "?", ",", ";", ":", "'", "/"]
-# REMOVING SPECIAL CHARACTERS
-for spec in spec_chars:
-    for question, answer in problems.items():
-        if spec in answer:
-            problems[question] = answer.replace(spec, "").lower()
-# TURNING ALL ANSWERS INTO LIST
-for question, answer in problems.items():
-    problems[question] = answer.split()
-grade_display = len(problems)
-max_display = len(problems)
-# MAIN
-def give_question():
-    global grade_display
-    global max_display
-    if len(problems) == 0:
-        clear()
-        print(
-            f"Congratulations You Scored {Fore.GREEN}{grade_display}/{max_display}{Style.RESET_ALL}\n\n {str((100/max_display)*grade_display)[:5]}%"
-        )
-    else:
-        clear()
-        question, answer = choice(list(problems.items()))
-        finalAnswer = input(
-            f"Problems Left: {len(problems)}\n\n{Fore.GREEN}{question}{Style.RESET_ALL}\n\n{Fore.BLUE}Answer:{Style.RESET_ALL} "
-        )
-        for spec in spec_chars:
-            for char in finalAnswer:
-                if spec in char:
-                    finalAnswer = finalAnswer.replace(spec, "")
-        finalAnswer = list(str(finalAnswer.split()).lower())
-        is_right = all(x in finalAnswer for x in str(answer).lower())
-        if is_right:
-            print(f"\n{Fore.GREEN}Correct Answer!{Style.RESET_ALL}")
-            problems.pop(question)
+problems = {"What is nine plus ten?": {"ANSWERS": "TWENTY ONE!"},
+            "What is inf + inf": {"ANSWERS": "16"}
+            }
+
+# FORMAT
+# {Question: {Answer: [Answer] }, {Misspellings: {word: [misspellings]} }}
+problem_Count, current_Grade = len(problems), len(problems)
+
+def algo(answer):
+    aMain = str(answer.lower())
+    special_characters = '!@#$%^&*()-_=+[{]};:.>/?`~'
+    for char in special_characters:
+        aMain = aMain.replace(char, '')
+    return aMain.split()
+
+def forward_algo(s):
+    forward = []
+    new_list = list(s).copy()
+    for index in range(len(s) - 1):
+        old = new_list[index]
+        new_list[index], new_list[index+1] = new_list[index+1], old
+        forward.append(''.join(new_list))
+        new_list = list(s).copy()
+    return forward
+
+def backward_algo(s):
+    backward = []
+    new_list = list(s).copy()
+    for index in range(len(s) - 1, 0, -1):
+        old = new_list[index]
+        new_list[index], new_list[index - 1] = new_list[index - 1], old
+        backward.append(''.join(new_list))
+        new_list = list(s).copy()
+    return backward
+
+for q, a in problems.items():
+    problems[q]["ANSWERS"] = algo(problems[q]["ANSWERS"])
+    problems[q]["MISSPELLINGS"] = {}
+
+for ques, ans in problems.items():
+    for element in ans["ANSWERS"]:
+        if not type(element) is int:
+            if len(element) >= 4:
+                problems[ques]["MISSPELLINGS"][element] = {"forwards": forward_algo(element), "backwards": backward_algo(element)}
+
+def main():
+    clear()
+    global current_Grade
+    if len(problems) != 0:
+        print(f'Problems Left: {len(problems)}\n')
+        question, answer = random.choice(list(problems.items()))
+        user_answer = input(f'{question}\n\n')
+
+        for word, misspellings in answer["MISSPELLINGS"].items():
+            if word not in misspellings:
+                for user_word in algo(user_answer):
+                    if user_word in misspellings['forwards'] or user_word in misspellings['backwards']:
+                        input(f"Misspelling Detected! The misspelled word is {word}! You typed in {user_word}!")
+
+        if all(x in algo(user_answer) for x in answer["ANSWERS"]):
+            input('Correct! Press ANY KEY for next question!')
         else:
-            print(f"\n\n{Fore.RED}Incorrect Answers{Style.RESET_ALL}\n\nCorrect Answer: {answer}")
-            problems.pop(question)
-            grade_display -= 1
-        input("Press ENTER For Next Question: ")
-        give_question()
-give_question()
+            input('Incorrect! Press ANY KEY for next question!')
+            current_Grade -= 1
+        problems.pop(question)
+    else:
+        input(f'Congratulations you have scored {(100/problem_Count)*current_Grade}!')
+    main()
+main()
