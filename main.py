@@ -13,6 +13,7 @@ else:
 # This was made/tested on Mac and Windows. I don't imagine someone studying on a Linux (Lol)
 
 problems = {}
+restartProblems = {}
 
 with open('guides.json', "r") as json_file:
     data = json.load(json_file)
@@ -77,9 +78,12 @@ for ques, ans in problems.items():
             if len(element) >= 4:
                 problems[ques]["MISSPELLINGS"][element] = {"forwards": forward_algo(element), "backwards": backward_algo(element)}
 
+restartProblems = problems.copy()
+
 def main():
     clear()
     global current_Grade
+    global problems
     if problems:
         print(f'Problems Left: {len(problems)}\n')
         question, answer = random.choice(list(problems.items()))
@@ -98,6 +102,8 @@ def main():
             current_Grade -= 1
         problems.pop(question)
     else:
-        input(f'Congratulations you have scored {(100/problem_Count)*current_Grade}!')
+        print(f'Congratulations you have scored {(100/problem_Count)*current_Grade}!')
+        input('Press ENTER if you would like to restart on this guide, or stop and setup for a different guide.')
+        problems = restartProblems.copy()
     main()
 main()
