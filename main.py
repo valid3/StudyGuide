@@ -53,9 +53,10 @@ def forward_algo(s):
     new_list = list(s).copy()
     for index in range(len(s) - 1):
         old = new_list[index]
-        new_list[index], new_list[index+1] = new_list[index+1], old
-        forward.append(''.join(new_list))
-        new_list = list(s).copy()
+        if new_list[index+1] != old:
+            new_list[index], new_list[index+1] = new_list[index+1], old
+            forward.append(''.join(new_list))
+            new_list = list(s).copy()
     return forward
 
 def backward_algo(s):
@@ -63,9 +64,10 @@ def backward_algo(s):
     new_list = list(s).copy()
     for index in range(len(s) - 1, 0, -1):
         old = new_list[index]
-        new_list[index], new_list[index - 1] = new_list[index - 1], old
-        backward.append(''.join(new_list))
-        new_list = list(s).copy()
+        if new_list[index - 1] != old:
+            new_list[index], new_list[index - 1] = new_list[index - 1], old
+            backward.append(''.join(new_list))
+            new_list = list(s).copy()
     return backward
 
 for q, a in problems.items():
@@ -102,7 +104,7 @@ def main():
             current_Grade -= 1
         problems.pop(question)
     else:
-        print(f'Congratulations you have scored {(100/problem_Count)*current_Grade}!')
+        print(f'Congratulations you have scored {(100/problem_Count)*current_Grade}! ({current_Grade}/{problem_Count})')
         input('Press ENTER if you would like to restart on this guide, or stop and setup for a different guide.')
         problems = restartProblems.copy()
     main()
