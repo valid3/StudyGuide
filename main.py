@@ -14,6 +14,7 @@ else:
 
 problems = {}
 restartProblems = {}
+wrong = {}
 
 with open('guides.json', "r") as json_file:
     data = json.load(json_file)
@@ -100,11 +101,17 @@ def main():
         if all(x in algo(user_answer) for x in answer["ANSWERS"]):
             input('Correct! Press ANY KEY for next question!')
         else:
-            input('Incorrect! Press ANY KEY for next question!')
+            input(f'Incorrect! The answer was ({" ".join(answer["ANSWERS"])}) Press ANY KEY for next question!')
+            wrong[question] = {"user_Answer": user_answer, "rightAnswer" : " ".join(answer['ANSWERS'])}
             current_Grade -= 1
         problems.pop(question)
     else:
-        print(f'Congratulations you have scored {(100/problem_Count)*current_Grade}! ({current_Grade}/{problem_Count})')
+        print(f'Congratulations you have scored {(100/problem_Count)*current_Grade}! ({current_Grade}/{problem_Count})\n')
+        if wrong:
+            for questionWrong, properties in wrong.items():
+                print(f'Question: {questionWrong} | Your Answer: {properties["user_Answer"]} | Right Answer: {properties["rightAnswer"]}')
+            print('\n')
+
         input('Press ENTER if you would like to restart on this guide, or stop and setup for a different guide.')
         problems = restartProblems.copy()
     main()
