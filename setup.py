@@ -1,98 +1,109 @@
-# PLEASE READ
-# Technically, this program isn't need but will make study guide writing easier and faster
-# Enjoy
-
+import tkinter
 import json
-import sys
-import os
+import customtkinter
 
-if sys.platform == 'win32':
-    def clr():
-        os.system('cls')
-else:
-    def clear():
-        os.system('clear')
+customtkinter.set_default_color_theme('green')
+QuestionsAnswers = {}
+currentQAR = 0
 
+root = customtkinter.CTk()
+root.geometry('500x651')
+root.title('Study Guide Setup')
+root.resizable(False, False)
 
-class main:
-    def __init__(self):
-        self.problems = {}
+# SETUP
+mainFrame = customtkinter.CTkFrame(master=root, width=470, height=545, border_width=3, border_color='#1C1C1C')
+scrollable_frame = customtkinter.CTkScrollableFrame(master=mainFrame, width=428, height=512, scrollbar_button_color='#222222', scrollbar_button_hover_color='#1C1C1C')
+controlFrame = customtkinter.CTkFrame(master=root, width=470, height=63, border_width=3, border_color='#1C1C1C')
+createQA = customtkinter.CTkButton(master=scrollable_frame, width=426, height=55, fg_color='#222222', hover_color='#1C1C1C', text='+', text_color='#333333', font=("Arial", 65))
+dividedButton = customtkinter.CTkSegmentedButton(master=controlFrame, values=['Exit', 'Save', 'Clear'], height=48, corner_radius=8, fg_color='#2B2B2B', unselected_color='#222222', unselected_hover_color='#1C1C1C', selected_hover_color='#1C1C1C', selected_color='#222222')
+switch1 = customtkinter.CTkSwitch(master=controlFrame, text='Ask To Clear', button_color='#222222', progress_color='#717171', button_hover_color='#171717')
+switch2 = customtkinter.CTkSwitch(master=controlFrame, text='Auto Clear On Save', button_color='#222222', progress_color='#717171', button_hover_color='#171717')
 
-    def add(self, question, answer):
-        self.problems[question] = answer
+# PLACEMENT
+mainFrame.place(x=15, y=15)
+scrollable_frame.place(x=10, y=10)
+controlFrame.place(x=15, rely=1, y=-77)
+dividedButton.place(x=7, y=7)
+switch1.select()
+switch1.place(x=170, y=20)
+switch2.place(x=290, y=20)
+createQA.grid(row=0, column=0, pady=1.75)
 
-    def exit(self):
-        name = input("Name of Guide (Type 'cancel' then press ENTER to cancel this action): ")
-        if name.lower() != 'cancel':
-            with open('guides.json', "r") as json_file:
-                data = json.load(json_file)
-            if name not in data:
-                data[name] = self.problems
-                with open('guides.json', 'w') as json_file2:
-                    json.dump(data, json_file2, indent=4)
-            else:
-                print('Guide name already in file! Please try this action again using a different name!')
+# FUNCTIONS
+def place():
+    global currentQAR
 
-    def ask(self):
-        clr()
-        question = input('Question: ')
-        answer = input('Answer: ')
-        clr()
-        print(f'Question: {question}\nAnswer: {answer}')
-        YN = input('\nWould you like to insert this into the guide? (Y/N): ')
-        if YN.lower() == 'y':
-            self.add(question, answer)
-        elif YN.lower() == 'n':
-            self.ask()
+    questionAnswerFrame = customtkinter.CTkFrame(master=scrollable_frame, width=426, height=70, fg_color='#222222')
+    entryQuestion = customtkinter.CTkEntry(master=questionAnswerFrame, placeholder_text="Question", corner_radius=4, width=355, height=33)
+    entryAnswer = customtkinter.CTkEntry(master=questionAnswerFrame, placeholder_text="Answer", corner_radius=4, width=355, height=33)
+    deleteButton = customtkinter.CTkButton(master=questionAnswerFrame, width=66, height=66, fg_color='#343638', hover_color='#1C1C1C', text_color='#9E9E9E', corner_radius=4, border_width=2, border_color='#565B5E', font=('Arial', 16))
 
-    def view(self):
-        for q, a in self.problems.items():
-            print(f'Question: {q}\nAnswer: {a}\n\n')
+    entryQuestion.place(x=1.75, y=1.75)
+    entryAnswer.place(x=1.75, y=35.75)
+    deleteButton.place(x=358, y=1.75)
+    deleteButton.configure(text="Delete", command=questionAnswerFrame.destroy)
 
-    def delete(self):
+    currentQAR += 1
+    createQA.grid(row=currentQAR, column=0, pady=1.75)
+    questionAnswerFrame.grid(row=currentQAR - 1, column=0, pady=1.75)
+    QuestionsAnswers[currentQAR - 1] = questionAnswerFrame
+
+def on_closing():
+    if tkinter.messagebox.askyesno("Quit", "Are you sure you want to quit? Any unsaved progress will be gone."):
+        root.destroy()
+
+def dividedHandler(value):
+    global currentQAR
+    if value == 'Clear':
+        if switch1.get() == 0:
+            for k, v in QuestionsAnswers.items():
+                v.destroy()
+            QuestionsAnswers.clear()
+            dividedButton.set('')
+            currentQAR = 0
+        else:
+            result = tkinter.messagebox.askyesno('Confirm', 'Are you sure you want to clear all questions/answers?')
+            if result:
+                for k, v in QuestionsAnswers.items():
+                    v.destroy()
+                QuestionsAnswers.clear()
+                dividedButton.set('')
+                currentQAR = 0
+    elif value == 'Clear2':
+        for k, v in QuestionsAnswers.items():
+            v.destroy()
+        QuestionsAnswers.clear()
+        dividedButton.set('')
+        currentQAR = 0
+    elif value == 'Exit':
+        on_closing()
+        dividedButton.set('')
+    elif value == 'Save':
+        name = tkinter.simpledialog.askstring('Save', 'What would you like to name the guide?')
+        problems = {}
+        for widget in scrollable_frame.winfo_children():
+            if isinstance(widget, customtkinter.CTkFrame):
+                question = widget.winfo_children()[0].get()
+                answer = widget.winfo_children()[1].get()
+                problems[question] = answer
         with open('guides.json', "r") as json_file:
             data = json.load(json_file)
-        for name in data.keys():
-            print(name)
-        to_delete = input("Type in the name of the guide you would like to delete: ")
-        YN = input(f'\nAre you sure you want to delete "{to_delete}"? (Y/N): ')
-        if YN.lower() == 'y':
-            data.pop(to_delete)
+        if name not in data:
+            data[name] = problems
             with open('guides.json', 'w') as json_file2:
                 json.dump(data, json_file2, indent=4)
-        elif YN.lower() == 'n':
-            self.ask()
+            tkinter.messagebox.showinfo('Success', 'Guide save is successful!')
+            dividedButton.set('')
+            if switch2.get() == 1:
+                dividedHandler('Clear2')
+        else:
+            tkinter.messagebox.showinfo('Error', 'The name you have chosen are already in your guides!')
+            dividedButton.set('')
 
-    def choice(self):
-        return int(input(
-            "Would you like to exit and save, write more questions, etc? Type...\n(1) Exit/Save\n(2) Write\n(3) View\n(4) Delete A Guide\n\nAction: "))
+# CONFIGURATION
+createQA.configure(command=place)
+dividedButton.configure(command=dividedHandler)
 
-try:
-    setup = main()
-
-    actions = {
-        "1": setup.exit,
-        "2": setup.ask,
-        "3": setup.view,
-        "4": setup.delete
-    }
-
-    def m():
-        clr()
-        try:
-            action = setup.choice()
-            actions[str(action)]()
-        except (ValueError, KeyError):
-            print("Invalid Action! Type 1, 2, 3, or 4 for the corresponding action above!")
-        input("Press ENTER to continue: ")
-        m()
-
-    m()
-except Exception as e:
-    with open('guides.json', "r") as backup:
-        data = json.load(backup)
-    data["BACKUP_TRUE"] = setup.problems
-    with open('guides.json', 'w') as json_file:
-        json.dump(data, json_file, indent=4)
-    print("AN UNEXPECTED ERROR HAS OCCURRED, A BACKUP HAS BEEN MADE IN GUIDES.JSON IN THE GUIDE NAMED 'BACKUP_TRUE'")
-    print(f"Error: {e}")
+root.protocol("WM_DELETE_WINDOW", on_closing)
+root.mainloop()
