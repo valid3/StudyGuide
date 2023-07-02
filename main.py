@@ -1,4 +1,6 @@
 # Hey, thank you for using this, I doubt anyone will, but that's okay, sometimes the least known software you find is the best
+
+# As of 7/01/2023, I am rewriting this code to a be a UI. Its almost finished.
 import random
 import json
 import sys
