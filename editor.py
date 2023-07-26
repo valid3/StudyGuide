@@ -269,16 +269,17 @@ class MAIN(customtkinter.CTk):
         problems = {}
 
         for widget in self.ScrollableEditorFrame.winfo_children():
-            if isinstance(widget, customtkinter.CTkFrame):
+            # Adds all the questions and answers from editor into a dictionary
+            if isinstance(widget, customtkinter.CTkFrame):  # Checks if its instance Frame
                 problems[widget.winfo_children()[0].get()] = widget.winfo_children()[
                     1
                 ].get()
 
-        if not self.editing:
+        if not self.editing:  # Checks if an existing guide is not being edited
             name = tkinter.simpledialog.askstring(
                 "Save", "What would you like to name the guide?"
             )
-            if name not in self.guides:
+            if name not in self.guides:  # Checks to see if guide already exists
                 self.guides[name] = problems
                 with open("guides.json", "w") as json_file:
                     json.dump(self.guides, json_file, indent=4)
@@ -288,7 +289,7 @@ class MAIN(customtkinter.CTk):
                 tkinter.messagebox.showinfo(
                     "Error", "The name you have chosen are already in your guides!"
                 )
-        else:
+        else:  # Automatically saves guide edit
             self.guides[self.EditingGuide["name"]] = problems
             with open("guides.json", "w") as json_file:
                 json.dump(self.guides, json_file, indent=4)
@@ -348,7 +349,9 @@ class MAIN(customtkinter.CTk):
             EntryAnswer.insert(0, answer)
 
         EntryQuestion.bind("<Return>", lambda event: self.Focus(EntryAnswer))
+        # QOA of Life - Skips to EntryAnswer when return is pressed
         EntryAnswer.bind("<Return>", lambda event: self.QOACreate())
+        # QOA of Life - Makes new question and answer when return is pressed
 
         self.CreateQA.grid(row=self.QARow, column=0, padx=3, pady=3)
         self.QuestionAnswers.append(MainFrame)
@@ -358,11 +361,11 @@ class MAIN(customtkinter.CTk):
         if qoa:
             return EntryQuestion
 
-    def Delete(self, qa):
+    def Delete(self, qa):  # Handler for deleting a questionAnswer
         qa.destroy()
         self.QuestionAnswers.remove(qa)
 
-    def DeleteGuide(self):
+    def DeleteGuide(self):  # Handles deleting guide
         if self.editing:
             if tkinter.messagebox.askyesno(
                 "Delete",

@@ -18,7 +18,8 @@ Study Guide is equipped with a guide editor, and a questioner.
 #### - Misspelling Algorithm!
 - This algorithm is simple but can be helpful and ensures you don't get frustrated all the time when you misspell a word and submit it! 
 
-How it works is it switches a letter with the one in front of it and adds it to a list. When a answer is submitted each word is checked and compared to this list.
+How it works is it switches a letter with the one in front of it and adds it to a list. When an answer is submitted each word is checked and compared to this list.
+
 ![misspellings.png](images%2Fmisspellings.png)
 ---
 ### Extra:
