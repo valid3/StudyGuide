@@ -208,7 +208,7 @@ class MAIN(customtkinter.CTk):
 
             # Makes sure name of Guide isn't long and overlapping past the Background Frame
             if len(GuideName) >= 9:
-                self.GuideNameDisplay.configure(text=f"Guide Name: {GuideName[0:8]}..")
+                GuideNameDisplay.configure(text=f"Guide Name: {GuideName[0:8]}..")
 
             # Finalizing
             self.EditGuideRow += 1
